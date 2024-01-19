@@ -15,6 +15,7 @@ public class Minesweeper extends Application {
         stage.setTitle("");
         stage.setScene(scene);
         stage.show();
+        System.out.println(new Map());
     }
 
     public static void main(String[] args) {
