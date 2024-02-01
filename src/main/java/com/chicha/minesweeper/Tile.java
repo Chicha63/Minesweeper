@@ -8,10 +8,11 @@ import javafx.scene.text.Text;
 public class Tile extends Rectangle {
     private final int type; //1 mine, 0 empty
     private int minesNearby = 0;
-    private Text text;
+    private Text text = new Text();
     public Tile(int type) {
-        super(10,10, Color.GRAY);
+        super(50,50, Color.GRAY);
         this.type = type;
+        this.setText(minesNearby+"");
     }
 
     public int getMinesNearby(){
@@ -23,18 +24,19 @@ public class Tile extends Rectangle {
             this.minesNearby++;
         else
             this.minesNearby = 0;
+        this.setText(""+minesNearby);
      }
 
     public int getType() {
         return type;
     }
 
-    public Text getText() {
-        return text;
+    public String getText() {
+        return text.getText();
     }
 
-    public void setText(Text text) {
-        this.text = text;
+    public void setText(String text) {
+        this.text.setText(text);
     }
 
     @Override
