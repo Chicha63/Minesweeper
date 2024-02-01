@@ -38,15 +38,7 @@ public class Minesweeper extends Application {
                 int finalLayoutY = layoutY+27;
                 tile.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
                     Tile clicked = (Tile) mouseEvent.getSource();
-                    Text label = new Text(clicked.getText());
-                    label.setLayoutX(finalLayoutX);
-                    label.setLayoutY(finalLayoutY);
-                    field.getChildren().add(label);
-                    if (clicked.getType() != 0){
-                        clicked.setFill(Color.RED);
-                    } else {
-                        clicked.setFill(Color.TEAL);
-                    }
+                    clicked.reveal(map, clicked.x, clicked.y);
                 });
             }
             layoutX = 0;
