@@ -47,6 +47,7 @@ public class Tile extends StackPane {
             current.tile.setFill(Color.TEAL);
             current.getChildren().add(current.getText());
             if(current.minesNearby == 0){
+                current.setText("");
                 if (x != 0){
                     if (y != 0)
                         reveal(map, x-1, y-1);
@@ -90,7 +91,17 @@ public class Tile extends StackPane {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if(!(obj instanceof Tile))
+            return false;
+        Tile toComp = (Tile) obj;
+        return this.x == toComp.x && this.y == toComp.y;
+    }
+
+    @Override
     public String toString() {
-        return type + "/" + minesNearby + "";
+        return x + " " + y + "\n";
     }
 }

@@ -1,16 +1,24 @@
 package com.chicha.minesweeper;
 
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Map {
+public class Map extends Pane {
     private Tile[][] map;
+    private ArrayList<Tile> mines;
     int sizeY, sizeX;
     private final int minesCount;
     private GameModes gameMode;
 
     public Map(int x, int y, int mines) {
         this.map = new Tile[y][x];
-        minesCount = mines;
+        this.minesCount = mines;
+        this.mines = new ArrayList<>();
         sizeX = map[0].length;
         sizeY = map.length;
         fill();
@@ -33,6 +41,7 @@ public class Map {
         }
         sizeX = map[0].length;
         sizeY = map.length;
+        this.mines = new ArrayList<>();
         fill();
     }
 
@@ -40,6 +49,7 @@ public class Map {
         this.map = new Tile[9][9];
         this.minesCount = 10;
         this.gameMode = GameModes.EASY;
+        this.mines = new ArrayList<>();
         fill();
     }
 
@@ -56,11 +66,19 @@ public class Map {
             }
         }
         for (int mineId = 0; mineId < minesCount; mineId++){
+            boolean rerun;
             do {
                 y = ThreadLocalRandom.current().nextInt(0, sizeY);
                 x = ThreadLocalRandom.current().nextInt(0, sizeX);
-            }while (map[x][y].getType() != 0 && ((x == 0 && y == 0) || (x == 0 && y == sizeY-1) || (x == sizeX-1 && y == 0) || (x == sizeX-1 && y == sizeY-1)));
+            }while (map[y][x].getType() == 1 || (
+                    (x == 0 && y == 0) ||
+                    (x == 0 && y == sizeY-1) ||
+                    (x == sizeX-1 && y == 0) ||
+                    (x == sizeX-1 && y == sizeY-1)
+                )
+            );
             map[y][x] = new Tile(1, x, y);
+            mines.add(new Tile(1, x, y));
             if (x != 0 && x != sizeX-1){
                 map[y][x-1].incrementMinesNearby();
                 map[y][x+1].incrementMinesNearby();
@@ -85,16 +103,11 @@ public class Map {
             } if (x == sizeX-1){
                 incrementMinesX(-1, y, x);
             }
+
         }
+        System.out.println(this);
     }
 
-    private void incrementMinesY(boolean bottomLimit,boolean rightLimit, int y, int x){
-        map[y][x+1].incrementMinesNearby();
-        map[y][x-1].incrementMinesNearby();
-        map[y += (bottomLimit ? -1 : 1)][x-1].incrementMinesNearby();
-        map[y][x].incrementMinesNearby();
-        map[y][x+1].incrementMinesNearby();
-    }
     private void incrementMinesX(int coef, int y, int x){
         map[y][x+coef].incrementMinesNearby();
         if (y == 0){
@@ -124,15 +137,31 @@ public class Map {
         map[y+1][x+1].incrementMinesNearby();
     }
 
+    public void drawMap(){
+        int layoutX = 0;
+        int layoutY = 0;
+        for (Tile[] tiles : this.getMap()){
+            for (Tile tile : tiles){
+                tile.setLayoutX(layoutX);
+                tile.setLayoutY(layoutY);
+                this.getChildren().add(tile);
+                layoutX+=51;
+                tile.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+                    new Events().tileClickEvent(mouseEvent, this);
+                });
+            }
+            layoutX = 0;
+            layoutY += 51;
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Tile[] el : map){
-            for (Tile el1 : el){
-                stringBuilder.append(el1).append(" ");
-            }
-            stringBuilder.append("\n");
+        for (Tile el1 : mines){
+            stringBuilder.append(el1);
         }
+        stringBuilder.append("\n");
         return stringBuilder.toString();
     }
 }
