@@ -2,15 +2,10 @@
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.control.ButtonType;
 
@@ -19,17 +14,17 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.TimerTask;
 
-    public class Minesweeper extends Application {
-    static Map field;
-    static BorderPane root;
-
+public class Minesweeper extends Application {
+    private static Menu menu;
+    private static Map field;
+    private static BorderPane root;
+    private static Scene scene;
     @Override
     public void start(Stage stage) throws IOException {
-        root = new BorderPane();
-        field = new Map(GameModes.EASY);
-        field.drawMap();
-        root.setCenter(field);
-        Scene scene = new Scene(root);
+        menu = new Menu();
+        menu.setAlignment(Pos.CENTER);
+        menu.getStartButton().setOnAction(actionEvent -> startGame(stage));
+        scene = new Scene(menu, 300, 200);
         stage.setScene(scene);
         stage.show();
     }
@@ -53,12 +48,21 @@ import java.util.TimerTask;
         });
     }
 
-        private static void resetGame() {
-            field = new Map(GameModes.EASY);
-            root.setCenter(field);
-            Events.activate();
-            field.drawMap();
-        }
+    private static void resetGame() {
+        field = new Map(GameModes.MEDIUM);
+        root.setCenter(field);
+        Events.activate();
+        field.drawMap();
+    }
+
+    private static void startGame(Stage stage) {
+        root = new BorderPane();
+        field = new Map(menu.getDifficulty().getValue());
+        field.drawMap();
+        root.setCenter(field);
+        stage.setScene(new Scene(root));
+    }
+
 
     public static void main(String[] args) {
         launch();
