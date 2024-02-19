@@ -11,13 +11,16 @@ public class Events {
         if (isActive){
             Tile clicked = (Tile) mouseEvent.getSource();
             clicked.reveal(map, clicked.x, clicked.y);
+            if (map.checkTiles()){
+                Minesweeper.showDialog(true);
+            }
             if (clicked.getType() == 1){
                 isActive = false;
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        Minesweeper.showGameOverDialog();
+                        Minesweeper.showDialog(false);
                     }
                 }, 2000);
             }

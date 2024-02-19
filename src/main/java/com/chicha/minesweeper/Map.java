@@ -1,5 +1,6 @@
 package com.chicha.minesweeper;
 
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
@@ -9,10 +10,13 @@ import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Map extends Pane {
+    private int score = 0;
     private Tile[][] map;
     private ArrayList<Tile> mines;
     int sizeY, sizeX;
     private final int minesCount;
+    private final int safeCount;
+    private int openedCount = 0;
     private GameModes gameMode;
 
     public Map(int x, int y, int mines) {
@@ -21,6 +25,7 @@ public class Map extends Pane {
         this.mines = new ArrayList<>();
         sizeX = map[0].length;
         sizeY = map.length;
+        this.safeCount = (x * y) - mines;
         fill();
     }
     public Map(GameModes gameMode) {
@@ -28,15 +33,18 @@ public class Map extends Pane {
             case MEDIUM -> {
                 this.map = new Tile[16][16];
                 this.minesCount = 40;
+                this.safeCount = (16 * 16) - minesCount;
             }
             case HARD -> {
                 this.map = new Tile[16][30];
                 this.minesCount = 99;
+                this.safeCount = (16 * 30) - 99;
             }
             default -> {
                 this.map = new Tile[9][9];
                 this.minesCount = 10;
                 this.gameMode = GameModes.EASY;
+                this.safeCount = (9 * 9) - 10;
             }
         }
         sizeX = map[0].length;
@@ -50,6 +58,7 @@ public class Map extends Pane {
         this.minesCount = 10;
         this.gameMode = GameModes.EASY;
         this.mines = new ArrayList<>();
+        this.safeCount = (9 * 9) - 10;
         fill();
     }
 
@@ -124,19 +133,6 @@ public class Map extends Pane {
         }
     }
 
-    private void incrementMinesAround(int y, int x){
-        map[y-1][x].incrementMinesNearby();
-        map[y-1][x+1].incrementMinesNearby();
-        map[y-1][x-1].incrementMinesNearby();
-
-        map[y][x-1].incrementMinesNearby();
-        map[y][x+1].incrementMinesNearby();
-
-        map[y+1][x].incrementMinesNearby();
-        map[y+1][x-1].incrementMinesNearby();
-        map[y+1][x+1].incrementMinesNearby();
-    }
-
     public void drawMap(){
         int layoutX = 0;
         int layoutY = 0;
@@ -146,13 +142,36 @@ public class Map extends Pane {
                 tile.setLayoutY(layoutY);
                 this.getChildren().add(tile);
                 layoutX+=51;
-                tile.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
-                    new Events().tileClickEvent(mouseEvent, this);
+                tile.setOnMouseClicked(mouseEvent -> {
+                    if (mouseEvent.getButton() == MouseButton.PRIMARY)
+                        new Events().tileClickEvent(mouseEvent, this);
+                    else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                        tile.toggleMarked();
+                        if (!tile.getRevealed()){
+                            this.addScore(tile.isMarked()?100:-100);
+                        }
+                    }
                 });
             }
             layoutX = 0;
             layoutY += 51;
         }
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void addScore(int score) {
+        this.score += score;
+    }
+
+    public void incrementOpened(){
+        openedCount++;
+    }
+
+    public boolean checkTiles(){
+        return openedCount == safeCount;
     }
 
     @Override

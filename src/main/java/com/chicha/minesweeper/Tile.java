@@ -3,6 +3,7 @@ package com.chicha.minesweeper;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
@@ -10,6 +11,7 @@ public class Tile extends StackPane {
     private final int type; //1 mine, 0 empty
     int x,y;
     private boolean isRevealed;
+    private boolean isMarked;
     private int minesNearby = 0;
     private Text text = new Text();
     private Rectangle tile = new Rectangle(50,50,Color.GRAY);
@@ -19,6 +21,7 @@ public class Tile extends StackPane {
         this.type = type;
         this.setText(minesNearby+"");
         this.setRevealed(false);
+        this.setMarked(false);
         this.x = x;
         this.y = y;
     }
@@ -38,12 +41,14 @@ public class Tile extends StackPane {
     public void reveal(Map map, int x, int y){
         Tile current = map.getMap()[y][x];
         if (current.isRevealed) return;
+        if (current.isMarked) map.addScore(-100);
         current.setRevealed(true);
         if (current.getType() != 0){
             current.tile.setFill(Color.RED);
             current.setText("M");
             current.getChildren().add(current.getText());
         } else {
+            map.incrementOpened();
             current.tile.setFill(Color.TEAL);
             current.getChildren().add(current.getText());
             if(current.minesNearby == 0){
@@ -67,6 +72,7 @@ public class Tile extends StackPane {
                 if (y != map.getMap().length-1)
                     reveal(map, x, y+1);
             }
+            map.addScore(50);
         }
     }
 
@@ -88,6 +94,21 @@ public class Tile extends StackPane {
 
     private void setRevealed(boolean b) {
         this.isRevealed = b;
+    }
+
+    public boolean isMarked() {
+        return isMarked;
+    }
+
+    public void setMarked(boolean marked) {
+        isMarked = marked;
+    }
+
+    public void toggleMarked(){
+        if(!isRevealed){
+            isMarked = !isMarked;
+            this.tile.setFill(isMarked ? Color.GREEN : Color.GRAY);
+        }
     }
 
     @Override
