@@ -10,19 +10,32 @@ import javafx.stage.Stage;
 import javafx.scene.control.ButtonType;
 
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
+import javax.crypto.*;
+import javax.crypto.spec.DESedeKeySpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.*;
 
-public class Minesweeper extends Application {
+    public class Minesweeper extends Application {
     private static Menu menu;
     private static Map field;
-    private static BorderPane root;
     private static Stage stage;
+    private static Cipher cipher;
+    private static SecretKey key;
 
     @Override
     public void start(Stage stage) {
+        try {
+            PBEKeySpec keySpec = new PBEKeySpec("12345678".toCharArray());
+            key = new SecretKeySpec("770A8A65DA156D24EE2A093277530142".getBytes(), "AES");
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Minesweeper.stage = stage;
         Minesweeper.stage.setScene(openMenu());
         Minesweeper.stage.show();
@@ -39,7 +52,7 @@ public class Minesweeper extends Application {
             } else {
                 alert.setTitle("Game Over");
                 alert.setHeaderText("Game Over");
-                alert.setContentText("Now exit or restart game!");
+                alert.setContentText("Enter your name for leaderboard");
             }
             ButtonType replayButton = new ButtonType("Replay");
             ButtonType menuButton = new ButtonType("Menu");
@@ -47,6 +60,11 @@ public class Minesweeper extends Application {
             alert.getButtonTypes().set(0, new ButtonType("Exit"));
             alert.getButtonTypes().add(menuButton);
             Optional<ButtonType> result = alert.showAndWait();
+            try {
+                writeScore(field.getScore());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (result.isPresent() && result.get() == replayButton) {
                 startGame();
             } else if (result.isPresent() && result.get() == menuButton){
@@ -60,7 +78,7 @@ public class Minesweeper extends Application {
 
     private static void startGame() {
         Events.activate();
-        root = new BorderPane();
+        BorderPane root = new BorderPane();
         field = new Map(menu.getDifficulty().getValue());
         field.drawMap();
         root.setCenter(field);
@@ -98,7 +116,63 @@ public class Minesweeper extends Application {
         menu = new Menu();
         menu.setAlignment(Pos.CENTER);
         menu.getStartButton().setOnAction(actionEvent -> startGame());
+        if (!Objects.equals(getLeaderboard(), "")){
+            String[] highScores = getLeaderboard().split("\\|");
+            for (String highScore:
+                    highScores) {
+                String[] splittedScore = highScore.split(";");
+                System.out.println("Map: " + splittedScore[0] + " | score: " + splittedScore[1] + "\n");
+            }
+        }
         return new Scene(menu, 300, 200);
+    }
+
+    private static void writeScore(int score) throws Exception {
+        String string = getLeaderboard();
+        java.util.Map<String,String> leaderboard = new HashMap<>();
+        for (String line :
+                string.split("\\|")) {
+            leaderboard.put(line.split(";")[0], line.split(";")[1]);
+        }
+        if (leaderboard.containsKey(field.toString())){
+            if (score > Integer.parseInt(leaderboard.get(field.toString()))){
+                leaderboard.put(field.toString(), String.valueOf(score));
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (java.util.Map.Entry<String,String> entry:
+             leaderboard.entrySet()) {
+            sb.append(entry.getKey()).append(";").append(entry.getValue()).append("|");
+        }
+        IvParameterSpec iv = new IvParameterSpec("0102030405060708".getBytes());
+        cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+        try (FileOutputStream fOut = new FileOutputStream("data.enc");
+             CipherOutputStream cOut = new CipherOutputStream(fOut, cipher)){
+            cOut.write(sb.toString().getBytes());
+        }
+    }
+
+    private static String getLeaderboard(){
+        try (FileInputStream fIn = new FileInputStream("data.enc")){
+            IvParameterSpec fIv = new IvParameterSpec("0102030405060708".getBytes());
+            cipher.init(Cipher.DECRYPT_MODE, key, fIv);
+            try(
+                    CipherInputStream cIn = new CipherInputStream(fIn, cipher);
+                    InputStreamReader inputReader = new InputStreamReader(cIn);
+                    BufferedReader br = new BufferedReader(inputReader)
+                    ){
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine())!= null){
+                    sb.append(line);
+                }
+                return sb.toString();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static void main(String[] args) {

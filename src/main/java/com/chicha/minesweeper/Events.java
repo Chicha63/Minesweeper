@@ -2,12 +2,16 @@ package com.chicha.minesweeper;
 
 import javafx.scene.input.MouseEvent;
 
+import javax.crypto.*;
+import java.io.FileOutputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Events {
     private static boolean isActive = true;
-    public void tileClickEvent(MouseEvent mouseEvent, Map map){
+    public static void tileClickEvent(MouseEvent mouseEvent, Map map){
         if (isActive){
             Tile clicked = (Tile) mouseEvent.getSource();
             clicked.reveal(map, clicked.x, clicked.y);

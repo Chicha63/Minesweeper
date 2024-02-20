@@ -114,7 +114,6 @@ public class Map extends Pane {
             }
 
         }
-        System.out.println(this);
     }
 
     private void incrementMinesX(int coef, int y, int x){
@@ -144,7 +143,7 @@ public class Map extends Pane {
                 layoutX+=51;
                 tile.setOnMouseClicked(mouseEvent -> {
                     if (mouseEvent.getButton() == MouseButton.PRIMARY)
-                        new Events().tileClickEvent(mouseEvent, this);
+                        Events.tileClickEvent(mouseEvent, this);
                     else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
                         tile.toggleMarked();
                         if (!tile.getRevealed()){
@@ -176,11 +175,19 @@ public class Map extends Pane {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Tile el1 : mines){
-            stringBuilder.append(el1);
+        switch (gameMode){
+            case HARD -> {
+                return "Hard";
+            }
+            case MEDIUM -> {
+                return "Medium";
+            }
+            case EASY -> {
+                return "Easy";
+            }
+            default -> {
+                return sizeX + " x " + sizeY + " " + minesCount + " mines";
+            }
         }
-        stringBuilder.append("\n");
-        return stringBuilder.toString();
     }
 }

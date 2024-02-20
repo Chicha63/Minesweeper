@@ -1,9 +1,9 @@
 package com.chicha.minesweeper;
 
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
@@ -46,6 +46,13 @@ public class Tile extends StackPane {
         if (current.getType() != 0){
             current.tile.setFill(Color.RED);
             current.setText("M");
+            current.tile.setFill(
+                    new ImagePattern(
+                        new Image(
+                                getClass().getClassLoader().getResourceAsStream("mine.png")
+                        )
+                    )
+            );
             current.getChildren().add(current.getText());
         } else {
             map.incrementOpened();
@@ -88,6 +95,10 @@ public class Tile extends StackPane {
         this.text.setText(text);
     }
 
+    public void changeImage(){
+
+    }
+
     public boolean getRevealed(){
         return isRevealed;
     }
@@ -107,7 +118,13 @@ public class Tile extends StackPane {
     public void toggleMarked(){
         if(!isRevealed){
             isMarked = !isMarked;
-            this.tile.setFill(isMarked ? Color.GREEN : Color.GRAY);
+            this.tile.setFill(isMarked ?
+                    new ImagePattern(
+                            new Image(
+                                    getClass().getClassLoader().getResourceAsStream("flag.png")
+                            )
+                    )
+                    : Color.GRAY);
         }
     }
 
