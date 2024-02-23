@@ -116,28 +116,34 @@ import java.util.*;
         menu = new Menu();
         menu.setAlignment(Pos.CENTER);
         menu.getStartButton().setOnAction(actionEvent -> startGame());
-        if (!Objects.equals(getLeaderboard(), "")){
-            String[] highScores = getLeaderboard().split("\\|");
-            for (String highScore:
-                    highScores) {
-                String[] splittedScore = highScore.split(";");
-                System.out.println("Map: " + splittedScore[0] + " | score: " + splittedScore[1] + "\n");
+        menu.getHighScoreButton().setOnAction(actionEvent -> {
+            if (!Objects.equals(getLeaderboard(), "")){
+                String[] highScores = getLeaderboard().split("\\|");
+                for (String highScore:
+                        highScores) {
+                    String[] splittedScore = highScore.split(";");
+                    System.out.println("Map: " + splittedScore[0] + " | score: " + splittedScore[1] + "\n");
+                }
             }
-        }
-        return new Scene(menu, 300, 200);
+        });
+        return new Scene(menu, 300, 400);
     }
 
     private static void writeScore(int score) throws Exception {
         String string = getLeaderboard();
         java.util.Map<String,String> leaderboard = new HashMap<>();
-        for (String line :
-                string.split("\\|")) {
-            leaderboard.put(line.split(";")[0], line.split(";")[1]);
+        if (!Objects.equals(string,"")){
+            for (String line :
+                    string.split("\\|")) {
+                leaderboard.put(line.split(";")[0], line.split(";")[1]);
+            }
         }
         if (leaderboard.containsKey(field.toString())){
             if (score > Integer.parseInt(leaderboard.get(field.toString()))){
                 leaderboard.put(field.toString(), String.valueOf(score));
             }
+        } else {
+            leaderboard.put(field.toString(), String.valueOf(score));
         }
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<String,String> entry:

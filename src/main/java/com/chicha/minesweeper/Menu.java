@@ -12,6 +12,7 @@ public class Menu extends VBox {
     private final Label diffLabel;
     private final ComboBox<GameModes> difficulty;
     private final Button startButton;
+    private final Button highScoreButton;
     private final Button exitButton;
 
     public Menu() {
@@ -21,18 +22,22 @@ public class Menu extends VBox {
         marginLabel1.setPrefHeight(10);
         Label marginLabel2 = new Label();
         marginLabel2.setPrefHeight(10);
+        Label marginLabel3 = new Label();
+        marginLabel3.setPrefHeight(10);
         diffLabel = new Label("Difficulty:");
         difficulty = new ComboBox<>();
         difficulty.getItems().addAll(GameModes.values());
         difficulty.setValue(GameModes.EASY);
         startButton = new Button("Start");
         startButton.setPrefWidth(100);
+        highScoreButton = new Button("Highest Scores");
+        highScoreButton.setPrefWidth(100);
         exitButton = new Button("Exit");
         exitButton.setPrefWidth(100);
         exitButton.setOnAction(actionEvent -> {
             System.exit(0);
         });
-        this.getChildren().addAll(title, diffLabel, difficulty, marginLabel1, startButton, marginLabel2, exitButton);
+        this.getChildren().addAll(title, diffLabel, difficulty, marginLabel1, startButton, marginLabel2, highScoreButton, marginLabel3, exitButton);
     }
 
     public Label getDiffLabel() {
@@ -45,6 +50,10 @@ public class Menu extends VBox {
 
     public Button getStartButton() {
         return startButton;
+    }
+
+    public Button getHighScoreButton() {
+        return highScoreButton;
     }
 
     public Button getExitButton() {
