@@ -2,12 +2,14 @@
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.scene.control.ButtonType;
+import javafx.stage.WindowEvent;
 
 
 import javax.crypto.*;
@@ -40,6 +42,13 @@ import java.util.*;
         Minesweeper.stage.setScene(openMenu());
         Minesweeper.stage.show();
         Minesweeper.stage.setTitle("Minesweeper");
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent t) {
+                Platform.exit();
+                System.exit(0);
+            }
+        });
     }
 
     public static void showDialog(boolean win){
