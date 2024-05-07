@@ -106,17 +106,20 @@ import java.util.*;
         });
         thread.start();
         switch (menu.getDifficulty().getValue()){
-            case EASY -> {
+            case EASY: {
                 stage.setX(540);
                 stage.setY(200);
+                break;
             }
-            case MEDIUM -> {
+            case MEDIUM: {
                 stage.setX(350);
                 stage.setY(50);
+                break;
             }
-            case HARD -> {
+            case HARD: {
                 stage.setX(0);
                 stage.setY(50);
+                break;
             }
         }
     }
@@ -135,7 +138,7 @@ import java.util.*;
                 }
             }
         });
-        return new Scene(menu, 300, 400);
+        return new Scene(menu, 500, 400);
     }
 
     private static void writeScore(int score) throws Exception {

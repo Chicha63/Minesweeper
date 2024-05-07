@@ -30,21 +30,24 @@ public class Map extends Pane {
     }
     public Map(GameModes gameMode) {
         switch (this.gameMode = gameMode){
-            case MEDIUM -> {
+            case MEDIUM: {
                 this.map = new Tile[16][16];
                 this.minesCount = 40;
                 this.safeCount = (16 * 16) - minesCount;
+                break;
             }
-            case HARD -> {
+            case HARD: {
                 this.map = new Tile[16][30];
                 this.minesCount = 99;
                 this.safeCount = (16 * 30) - 99;
+                break;
             }
-            default -> {
+            default: {
                 this.map = new Tile[9][9];
                 this.minesCount = 10;
                 this.gameMode = GameModes.EASY;
                 this.safeCount = (9 * 9) - 10;
+                break;
             }
         }
         sizeX = map[0].length;
@@ -176,16 +179,16 @@ public class Map extends Pane {
     @Override
     public String toString() {
         switch (gameMode){
-            case HARD -> {
+            case HARD: {
                 return "Hard";
             }
-            case MEDIUM -> {
+            case MEDIUM: {
                 return "Medium";
             }
-            case EASY -> {
+            case EASY: {
                 return "Easy";
             }
-            default -> {
+            default: {
                 return sizeX + " x " + sizeY + " " + minesCount + " mines";
             }
         }
